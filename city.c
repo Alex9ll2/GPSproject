@@ -12,7 +12,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "../headers/cities.h"
+#include "headers/cities.h"
 
 /*
  * -------- Estructura ciudad ------------

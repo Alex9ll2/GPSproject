@@ -79,13 +79,13 @@ following these rules:
 otherwise, we must repeat the operation on that node.
 NOTE: THIS FUNCTION IS RECURSIVE (but it can also be implemented 
 iteratively) */
-boolean add_node(node * n, void * data, comp_func compare) 
+bool add_node(node * n, void * data, comp_func compare) 
 { 
   int res = compare(data, n->data);
   if(res == 0)
   {
     /* element already exists, cannot be inserted */
-    return FALSE;
+    return false;
   }
   else if(res < 0) 
   {
@@ -94,7 +94,7 @@ boolean add_node(node * n, void * data, comp_func compare)
     {
       /* reached end of this branch, space available for insertion */
       n->left = createLeaf(data);
-      return TRUE;
+      return true;
     } 
     else 
     {
@@ -108,7 +108,7 @@ boolean add_node(node * n, void * data, comp_func compare)
     {
       /* reached end of this branch, space available for insertion */
       n->right = createLeaf(data);
-      return TRUE;
+      return true;
     } 
     else 
     {
@@ -122,7 +122,7 @@ an ADT, we could maintain multiple Sets in memory at the same time.
 If we were just building a Binary Tree for a known data type, we could go 
 straight to inserting at the root. */
 
-boolean set_add(set * s, void * data) 
+bool set_add(set * s, void * data) 
 {
   /* if the root is NULL or if there are no elements, we know the SET is
   empty, and we can start building the tree by inserting the first
@@ -131,52 +131,52 @@ boolean set_add(set * s, void * data)
   {
     s->root = createLeaf(data);
     s->size = 1;
-    return TRUE;
+    return true;
   }
 
   /* if the root is occupied, we start searching for the spot where the new
   node (leaf) will exist. THIS IS WHERE OUR RECURSION BEGINS.
 
-  we know add_node will insert the new element in the tree or return FALSE 
+  we know add_node will insert the new element in the tree or return false 
   if it already existed. Either way, we’ll know the result after this function 
   finishes */
   
-  boolean inserted = add_node(s->root, data, s->compare);
+  bool inserted = add_node(s->root, data, s->compare);
   if(inserted)
   {
     s->size++;
-    return TRUE;
+    return true;
   }
   else
   {
-    return FALSE;
+    return false;
   }
 }
 
 /* Function to add a new element iteratively (without recursion) */
-boolean set_add_iterative(set * s, void * data) 
+bool set_add_iterative(set * s, void * data) 
 {
   if(s->root == NULL) {		// if(set->size == 0) {
     s->root = createLeaf(data);
     s->size = 1;
-    return TRUE;
+    return true;
   }
   //	The tree is not empty. We need to find the spot for the new key
-  boolean found = FALSE, added = FALSE;
+  bool found = false, added = false;
   node * current = s->root;
   while(!found && !added) 
   {
     int res = s->compare(data, current->data);
     if(res == 0)      // key = current->key, EXISTS ALREADY ignore
     {				
-      found = TRUE;
+      found = true;
     } 
     else if(res < 0)  // key < current->key  ... take LEFT
     {		
       if(current->left == NULL) 
       {
         current->left = createLeaf(data);
-        added = TRUE;
+        added = true;
       } else 
       {
         current = current->left;
@@ -187,7 +187,7 @@ boolean set_add_iterative(set * s, void * data)
       if(current->right == NULL) 
       {
         current->right = createLeaf(data);
-        added = TRUE;
+        added = true;
       } else 
       {
         current = current->right;
@@ -225,13 +225,13 @@ void set_print(set *s)
 /* Checks if an element already exists in the tree. This function follows the 
 same traversal logic (print) but adds the check for whether the element exists
 and avoids exploring branches where we know the element can no longer be found*/
-boolean containsKey(node * n, void * data, comp_func compare) 
+bool containsKey(node * n, void * data, comp_func compare) 
 {
   if(n == NULL) 
-    return FALSE;
+    return false;
 
   int res = compare(data, n->data);
-  if(res == 0) return TRUE;
+  if(res == 0) return true;
 
   if(res  < 0) 
   {
@@ -244,7 +244,7 @@ boolean containsKey(node * n, void * data, comp_func compare)
 }
 
 /* Entry point for set_contains */
-boolean set_contains(set * s, void * data) {
+bool set_contains(set * s, void * data) {
   return containsKey(s->root, data, s->compare);
 }
 

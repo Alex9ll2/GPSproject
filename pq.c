@@ -107,7 +107,7 @@ void * pq_poll(pq * q)
   /* paso 1: subir el ultimo elemento insertado como nueva raiz */
   q->heap[0] = q->heap[q->size];
   int current_idx = 0;
-  boolean stop_swapping = FALSE;
+  bool stop_swapping = false;
 
   /* paso 2, bajar ese elemento hasta que encuentre su lugar, intercambiandose
   por el hijo de mayor prioridad */
@@ -137,7 +137,7 @@ void * pq_poll(pq * q)
     }
     else 
     {
-      stop_swapping = TRUE;
+      stop_swapping = true;
     }
   }
   return toPoll;
