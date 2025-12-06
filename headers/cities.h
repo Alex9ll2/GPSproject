@@ -4,11 +4,12 @@
 */
 
 #ifndef CITIES_H_
+#define CITIES_H_
+
     #include <stdbool.h>
-    #define CITIES_H_
     typedef struct city City;
     
-    City * createCity(char name[], int neighbors); // Crear una ciudad desde ceros
-    bool connectCities(City * C1, City * C2); // Connect to cities
+    City* createCity(const char* name);  //crear una ciudad desde ceros
+    bool connectCities(City* A, City* B, float distancia); //conectar dos ciudades
 
 #endif
