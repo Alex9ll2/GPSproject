@@ -24,13 +24,19 @@ typedef void (*print_func)  (void *);
 
 /* Our Set */
 typedef struct set_str set;
+typedef struct set_iterator_str set_iterator;
 
 /* Public functions of the Set ADT */
 set * set_create(comp_func, print_func);
 int  set_size(set *);
 bool set_add(set *, void *);
+bool set_remove(set* s, void* data);
 bool set_contains(set *, void *);
 void set_print(set *);
 void set_destroy(set *);
+set_iterator* set_iter_create(set* s);
+bool set_iter_has_next(set_iterator* it);
+void* set_iter_next(set_iterator* it);
+void set_iter_destroy(set_iterator* it);
 
 #endif /* SET_H_ */

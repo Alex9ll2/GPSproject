@@ -1,4 +1,4 @@
-  #include "map.h"
+  #include "headers/map.h"
   #include <stdlib.h>
   #include <stdio.h>
   
@@ -43,9 +43,15 @@
   {
     return m->size;
   }
+
+  int map_capacity (map * m) 
+  {
+    return m->M;
+  }
   
   /* creates node and stores data in it */
-  node * createNode(void * key, void * value) {
+  node * createNode(void * key, void * value) 
+  {
     node * n = (node *) malloc(sizeof(struct node_str));
     n->key = key;
     n->value = value;
@@ -64,16 +70,16 @@
     /* get bucket number to insert */
     int hashcode = m->hash(key);
     int bucket = hashcode % m->M;
-    printf("map_put: hashing key = %d\n", hashcode);
-    printf("map_put: bucket = hash mod %d = %d\n", m->M, bucket);
+    // printf("map_put: hashing key = %d\n", hashcode);
+    // printf("map_put: bucket = hash mod %d = %d\n", m->M, bucket);
    
     node * n = m->hashTable[bucket];
-    printf("map_put:start, looking in bucket %d\n", bucket);
+    //printf("map_put:start, looking in bucket %d\n", bucket);
 
     if(m->hashTable[bucket] == NULL) 
     {
       /* case: the bucket is empty, no elements in the list */
-      printf("map_put: List is NULL, creating first node at bucket %d\n", bucket);
+      //printf("map_put: List is NULL, creating first node at bucket %d\n", bucket);
       m->hashTable[bucket] = createNode(key, value);
       m->size ++;
       return;
@@ -87,14 +93,14 @@
       if(m->key_equals(key, n->key))
       { 
         /* Update value (overwrites) and return */
-        printf("map_put: Found, update!\n");
+        //printf("map_put: Found, update!\n");
         n->value = value;
         return;
       }
       else
       {
         /* not in this node? continue with the next */
-        printf("map_put: Not here, keep searching\n");
+        //printf("map_put: Not here, keep searching\n");
         n = n->next;
       }
     }
@@ -149,3 +155,88 @@
     }
     return n != NULL ? n->value : NULL;
   }
+
+
+void map_destroy(map * m) 
+{
+  /* free all nodes in all buckets */
+  for(int i = 0; i < m->M ; i ++) 
+  {
+    node * n = m->hashTable[i];
+    while(n != NULL) 
+    {
+      node * temp = n;
+      n = n->next;
+      free(temp);
+    }
+  }
+  free(m->hashTable);
+  free(m);
+}
+  
+//map iterator
+// map_iterator struct (mantén el typedef igual que antes)
+struct map_iterator_str {
+  map * m;
+  int bucketIndex;
+  node * currentNode;
+};
+
+// Crear iterador: posiciona en el primer nodo válido o currentNode = NULL si no hay.
+map_iterator * map_iter_create(map * m) 
+{
+  map_iterator * it = malloc(sizeof(map_iterator));
+  it->m = m;
+  it->bucketIndex = 0;
+  it->currentNode = NULL;
+
+  // find first non-empty bucket
+  while (it->bucketIndex < it->m->M && it->m->hashTable[it->bucketIndex] == NULL) {
+    it->bucketIndex++;
+  }
+  if (it->bucketIndex < it->m->M) {
+    it->currentNode = it->m->hashTable[it->bucketIndex];
+  } else {
+    it->currentNode = NULL;
+  }
+  return it;
+}
+
+// Devuelve true si hay un elemento disponible ahora o en algún bucket futuro.
+bool map_iter_has_next(map_iterator * it) 
+{
+  return it->currentNode != NULL;
+}
+
+// Devuelve la key actual y avanza el iterador (o NULL si no hay más)
+void * map_iter_next(map_iterator * it) 
+{
+  if (!it->currentNode) return NULL;
+
+  void * result = it->currentNode->key;
+
+  // Avanzar en la lista actual
+  if (it->currentNode->next != NULL) {
+    it->currentNode = it->currentNode->next;
+    return result;
+  }
+
+  // Sino, buscar el siguiente bucket no vacío
+  int idx = it->bucketIndex + 1;
+  it->currentNode = NULL;
+  while (idx < it->m->M) {
+    if (it->m->hashTable[idx] != NULL) {
+      it->bucketIndex = idx;
+      it->currentNode = it->m->hashTable[idx];
+      break;
+    }
+    idx++;
+  }
+
+  return result;
+}
+
+void map_iter_destroy(map_iterator * it) 
+{
+  free(it);
+}

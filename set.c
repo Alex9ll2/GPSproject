@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "set.h"
+#include "headers/set.h"
 
 /* Set
 A Set is a container that allows us to store elements
@@ -198,6 +198,79 @@ bool set_add_iterative(set * s, void * data)
   return added;
 }
 
+// Busca el nodo más pequeño de un subárbol (para eliminar cuando tiene dos hijos)
+node* findMin(node* n) {
+    while(n->left != NULL)
+        n = n->left;
+    return n;
+}
+
+node* removeNode(node* root, void* data, comp_func compare, bool* removed)
+{
+    if(root == NULL)
+        return NULL;
+
+    int res = compare(data, root->data);
+
+    if(res < 0)
+    {
+        root->left = removeNode(root->left, data, compare, removed);
+    }
+    else if(res > 0)
+    {
+        root->right = removeNode(root->right, data, compare, removed);
+    }
+    else
+    {
+        // Encontramos el nodo a eliminar
+        *removed = true;
+
+        // Caso 1: sin hijos
+        if(root->left == NULL && root->right == NULL)
+        {
+            free(root);
+            return NULL;
+        }
+
+        // Caso 2: un hijo
+        if(root->left == NULL)
+        {
+            node* temp = root->right;
+            free(root);
+            return temp;
+        }
+        else if(root->right == NULL)
+        {
+            node* temp = root->left;
+            free(root);
+            return temp;
+        }
+
+        // Caso 3: dos hijos, reemplazar por inorder successor
+        node* minNode = findMin(root->right);
+        root->data = minNode->data;   // copiar dato
+        root->right = removeNode(root->right, minNode->data, compare, removed);
+    }
+
+    return root;
+}
+
+
+bool set_remove(set* s, void* data)
+{
+    if(s == NULL || s->root == NULL)
+        return false;
+
+    bool removed = false;
+    s->root = removeNode(s->root, data, s->compare, &removed);
+
+    if(removed)
+        s->size--;
+
+    return removed;
+}
+
+
 /* In-Order Print 
   Prints LEFT - NODE - RIGHT  
   until it reaches NULL pointers (leaves of the tree) */
@@ -265,13 +338,65 @@ void destroyNode(node * n, print_func pf)
   destroyNode(n->left,  pf);
   destroyNode(n->right, pf);
 
-  printf("The node with key will be deleted: ");
-  pf(n->data);
-  printf("\n");
+  //printf("The node with key will be deleted: ");
+  //pf(n->data);
+  //printf("\n");
   free(n);
 }
 
 void set_destroy(set * s) 
 {
   destroyNode(s->root, s->printme);
+}
+
+
+struct set_iterator_str{
+    void** arr;
+    int size;
+    int index;
+};
+
+void fillArrayInorder(node* n, void** arr, int* index) {
+    if (n == NULL) return;
+
+    fillArrayInorder(n->left, arr, index);
+    arr[*index] = n->data;
+    (*index)++;
+    fillArrayInorder(n->right, arr, index);
+}
+
+
+void** set_to_array(set* s) {
+    if (!s || s->size == 0) return NULL;
+
+    void** arr = malloc(sizeof(void*) * s->size);
+    int index = 0;
+    fillArrayInorder(s->root, arr, &index);
+    return arr;
+}
+
+
+set_iterator* set_iter_create(set* s) 
+{
+    set_iterator* it = malloc(sizeof(set_iterator));
+    it->size = s->size;
+    it->arr = set_to_array(s);
+    it->index = 0;
+    return it;
+}
+
+
+bool set_iter_has_next(set_iterator* it) 
+{
+  return it->index < it->size;
+}
+
+void* set_iter_next(set_iterator* it) {
+    return it->arr[it->index++];
+}
+
+
+void set_iter_destroy(set_iterator* it) {
+    free(it->arr);
+    free(it);
 }

@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "pq.h"
+#include "headers/pq.h"
 
 struct pq_str {
   void ** heap;		/* heap es el arreglo que almacenará los datos 
