@@ -2,6 +2,7 @@
 #define SET_H_
 
 #include <stdbool.h>
+#include "utils.h"
 /* Function pointer for the comparison function; this is programmed
 by the user in order to use the tree. The user is responsible for 
 determining if one object to be stored in the tree is greater than the other.
@@ -14,13 +15,11 @@ For this example, we use A and B to illustrate the following:
 If both objects are equal       = returns 0  
 If object A < B                 = returns -1  
 If object A > B                 = returns 1 */
-typedef int  (*comp_func)(void * A, void * B);
 
 /* Function pointer to a function that prints the data.
 The tree doesn't know what it's storing (they are just void *),
 so it needs to know how to interpret and print the data. This user-provided
 function helps with that task */
-typedef void (*print_func)  (void *);
 
 /* Our Set */
 typedef struct set_str set;

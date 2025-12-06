@@ -147,3 +147,16 @@ int pq_size(pq * q)
 {
   return q->size;
 }
+
+
+void pq_destroy(pq* pQueue)
+{
+  for(int i = 0; i < pQueue->size; i++)
+  {
+    free(pQueue->heap[i]);
+  }
+
+  free(pQueue->heap);
+
+  free(pQueue);
+}

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include "headers/map.h"
 #include "headers/set.h"
 #include "headers/pq.h"
@@ -9,7 +10,7 @@ static comp_func GLOBAL_VERTEX_CMP = NULL;
 
 
 typedef struct Edge {
-    void* dest;
+    void* node;
     int distance;
 } Edge;
 
@@ -17,18 +18,35 @@ typedef struct Edge {
 typedef struct graph {
     map* adjacencyList;
     comp_func compareFunc;
+    hash_func hashFunc;
     equals_func equalsFunc;
     print_func printFunc;
 } graph;
 
-// Compara exclusivamente por destino usando equalsFunc
 int compareEdge(void* a, void* b) 
 {
     Edge* e1 = (Edge*) a;
     Edge* e2 = (Edge*) b;
 
-    if (GLOBAL_VERTEX_CMP(a, b) == 0) return 0;
-    return (e1->dest < e2->dest) ? -1 : 1;
+    if (GLOBAL_VERTEX_CMP(e1->node, e2->node) == 0) return 0;
+    return (e1->distance < e2->distance) ? -1 : 1;
+}
+
+int compareEdgeDistance(void* a, void* b) 
+{
+    Edge* e1 = (Edge*) a;
+    Edge* e2 = (Edge*) b;
+
+    return e1->distance - e2->distance;
+}
+
+Edge* edge_create(void* node, int distance)
+{
+    Edge* edge = malloc(sizeof(Edge));
+    edge->node = node;
+    edge->distance = distance;
+
+    return edge;
 }
 
 graph* createGraph(int capacity, hash_func hashF, equals_func equalsF, comp_func compareF, print_func printF) 
@@ -36,8 +54,10 @@ graph* createGraph(int capacity, hash_func hashF, equals_func equalsF, comp_func
     graph* g = malloc(sizeof(graph));
     g->adjacencyList = map_create(capacity, hashF, equalsF);
     g->compareFunc = compareF;
+    g->hashFunc = hashF;
     g->equalsFunc = equalsF;
     g->printFunc = printF;
+    printf("WHATT");
     GLOBAL_VERTEX_CMP = compareF;
     return g;
 }
@@ -62,13 +82,12 @@ bool addEdge(graph* g, void* from, void* to, int distance)
 
 
     Edge temp;
-    temp.dest = to;
+    temp.node = to;
+    temp.distance = 0;
     
     // evitar duplicados
     if (!set_contains(edgesSet, &temp)) {
-        Edge* e = malloc(sizeof(Edge));
-        e->dest = to;
-        e->distance = distance;
+        Edge* e = edge_create(to, distance);
         set_add(edgesSet, e);
     }
 
@@ -83,12 +102,10 @@ bool addEdge(graph* g, void* from, void* to, int distance)
 
 
 
-    temp.dest = from;
+    temp.node = from;
 
     if (!set_contains(edgesSet, &temp)) {
-        Edge* r = malloc(sizeof(Edge));
-        r->dest = from;
-        r->distance = distance;
+        Edge* r = edge_create(from, distance);
         set_add(edgesSet, r);
     }
 
@@ -117,7 +134,7 @@ bool removeEdge(graph* g, void* from, void* to)
         while (set_iter_has_next(it))
         {
             Edge* e = set_iter_next(it);
-            if (g->equalsFunc(e->dest, to))
+            if (g->equalsFunc(e->node, to))
             {
                 set_remove(edgesFrom, e);
                 free(e);    // primero remove, luego free
@@ -136,7 +153,7 @@ bool removeEdge(graph* g, void* from, void* to)
         while (set_iter_has_next(it))
         {
             Edge* e = set_iter_next(it);
-            if (g->equalsFunc(e->dest, from))
+            if (g->equalsFunc(e->node, from))
             {
                 set_remove(edgesTo, e);
                 free(e);
@@ -169,7 +186,7 @@ void graph_print(graph* g)
         while (set_iter_has_next(sit)) {
             Edge* edge = set_iter_next(sit);
             printf("[To: ");
-            g->printFunc(edge->dest);
+            g->printFunc(edge->node);
             printf(", Dist: %d] ", edge->distance);
         }
         set_iter_destroy(sit);
@@ -206,7 +223,6 @@ void graph_destroy(graph* g)
         while (set_iter_has_next(sit)) 
         {
             Edge* e = set_iter_next(sit);
-            g->printFunc(e->dest);
             free(e);
         }
 
@@ -220,4 +236,89 @@ void graph_destroy(graph* g)
 
     map_destroy(g->adjacencyList);
     free(g);
+}
+
+//retorna un hashmap<node, int>
+//con las distancias más cercanas del origin a cada nodo
+map* dijkstra(graph* g, void* origin)
+{
+    // hashmap <node, int*>
+    map* distances = map_create(100, g->hashFunc, g->equalsFunc);
+
+    // priority queue de edges
+    pq* pQueue = pq_create(100, compareEdgeDistance);
+
+    // set de nodos
+    set* visited = set_create(g->compareFunc, g->printFunc);
+
+
+    map_iterator* it = map_iter_create(g->adjacencyList);
+    while (map_iter_has_next(it)) 
+    {
+        void* vertex = map_iter_next(it);
+
+        int* dist = malloc(sizeof(int));
+        *dist = INT_MAX;
+        if (g->equalsFunc(vertex, origin))
+            *dist = 0;
+
+        map_put(distances, vertex, dist);
+
+        Edge* start = edge_create(vertex, *dist);
+        pq_offer(pQueue, start);
+    }
+
+    map_iter_destroy(it);
+
+    while (pq_peek(pQueue) != NULL) 
+    {
+        Edge* current = pq_poll(pQueue);
+
+        int bestDist = *((int*) map_get(distances, current->node));
+        if (current->distance != bestDist) 
+        {
+            //entrada obsoleta
+            free(current);
+            continue;
+        }
+
+        // Evitar procesar un nodo más de una vez
+        if (set_contains(visited, current->node)) 
+        {
+            free(current);
+            continue;
+        }
+
+        set_add(visited, current->node);
+
+        set* neighborsSet = map_get(g->adjacencyList, current->node);
+        set_iterator* sit = set_iter_create(neighborsSet);
+
+        while (set_iter_has_next(sit)) 
+        {
+            Edge* neighbor = set_iter_next(sit);   // edge original del grafo
+            void* v = neighbor->node;
+
+            int oldDist = *((int*) map_get(distances, v));
+            int newDist = current->distance + neighbor->distance;
+
+            if (newDist < oldDist) 
+            {
+                int* d = malloc(sizeof(int));
+                *d = newDist;
+                map_put(distances, v, d);
+
+                Edge* temp = edge_create(v, newDist);
+                pq_offer(pQueue, temp);
+            }
+        }
+
+        set_iter_destroy(sit);
+        free(current);     // este Edge ya no se necesita
+    }
+
+    set_destroy(visited);
+    pq_destroy(pQueue);
+
+    return distances;  // contiene int* válidos para cada nodo
 }

@@ -1,4 +1,5 @@
   #include "headers/map.h"
+  #include "headers/utils.h"
   #include <stdlib.h>
   #include <stdio.h>
   
@@ -173,6 +174,38 @@ void map_destroy(map * m)
   free(m->hashTable);
   free(m);
 }
+
+
+void map_print(map* m, print_func printKey, print_func printValue) 
+{
+    if (!m) {
+        printf("Map is NULL\n");
+        return;
+    }
+
+    printf("Map {size=%d, capacity=%d}\n", m->size, m->M);
+
+    for (int i = 0; i < m->M; i++) 
+    {
+        node* n = m->hashTable[i];
+
+        if (!n) continue;  // bucket vacío
+
+        printf("  Bucket %d:\n", i);
+
+        while (n != NULL) 
+        {
+            printf("    [");
+            printKey(n->key);
+            printf("] -> ");
+            printValue(n->value);
+            printf("\n");
+
+            n = n->next;
+        }
+    }
+}
+
   
 //map iterator
 // map_iterator struct (mantén el typedef igual que antes)
