@@ -256,17 +256,17 @@ map* dijkstra(graph* g, void* origin)
     while (map_iter_has_next(it)) 
     {
         void* vertex = map_iter_next(it);
-
         int* dist = malloc(sizeof(int));
         *dist = INT_MAX;
-        if (g->equalsFunc(vertex, origin))
-            *dist = 0;
-
         map_put(distances, vertex, dist);
-
-        Edge* start = edge_create(vertex, *dist);
-        pq_offer(pQueue, start);
     }
+
+    int* originDist = malloc(sizeof(int));
+    *originDist = 0;
+    map_put(distances, origin, originDist);
+    Edge* start = edge_create(origin, 0);
+    pq_offer(pQueue, start);
+
 
     map_iter_destroy(it);
 
