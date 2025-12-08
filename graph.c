@@ -62,6 +62,48 @@ graph* createGraph(int capacity, hash_func hashF, equals_func equalsF, comp_func
     return g;
 }
 
+void graph_print(graph* g)
+{
+    if (!g) 
+    {
+        return;
+    }
+
+    map_iterator* it = map_iter_create(g->adjacencyList);
+
+    while (map_iter_has_next(it)) 
+    {
+        void* key = map_iter_next(it);
+
+        set* edgesSet = map_get(g->adjacencyList, key);
+
+        if (!edgesSet) 
+        {
+            continue;
+        }
+
+        printf("Node: ");
+        g->printFunc(key);
+        printf(" -> ");
+
+        set_iterator* sit = set_iter_create(edgesSet);
+
+        while (set_iter_has_next(sit)) 
+        {
+            Edge* edge = set_iter_next(sit);
+            printf("[To: ");
+            g->printFunc(edge->node);
+            printf(", Dist: %d] ", edge->distance);
+        }
+
+        set_iter_destroy(sit);
+
+        printf("\n");
+    }
+
+    map_iter_destroy(it);
+}
+
 bool addEdge(graph* g, void* from, void* to, int distance) 
 {
     if (!g || !from || !to) 
@@ -87,10 +129,14 @@ bool addEdge(graph* g, void* from, void* to, int distance)
     {
         Edge* e = edge_create(to, distance);
         set_add(edgesSet, e);
+        printf("Added: %s -> %s\n", from, to);
+        graph_print(g);
     }
 
     // to -> from
+    printf("Todo normal\n");
     edgesSet = map_get(g->adjacencyList, to);
+    printf("CRASHEA\n");
 
     if (!edgesSet) 
     {
@@ -104,7 +150,10 @@ bool addEdge(graph* g, void* from, void* to, int distance)
     {
         Edge* r = edge_create(from, distance);
         set_add(edgesSet, r);
+        printf("Se insertó: %s -> %s\n", to, from);
+        graph_print(g);
     }
+
 
     return true;
 }
@@ -167,47 +216,6 @@ bool removeEdge(graph* g, void* from, void* to)
     return removed;
 }
 
-void graph_print(graph* g)
-{
-    if (!g) 
-    {
-        return;
-    }
-
-    map_iterator* it = map_iter_create(g->adjacencyList);
-
-    while (map_iter_has_next(it)) 
-    {
-        void* key = map_iter_next(it);
-
-        set* edgesSet = map_get(g->adjacencyList, key);
-
-        if (!edgesSet) 
-        {
-            continue;
-        }
-
-        printf("Node: ");
-        g->printFunc(key);
-        printf(" -> ");
-
-        set_iterator* sit = set_iter_create(edgesSet);
-
-        while (set_iter_has_next(sit)) 
-        {
-            Edge* edge = set_iter_next(sit);
-            printf("[To: ");
-            g->printFunc(edge->node);
-            printf(", Dist: %d] ", edge->distance);
-        }
-
-        set_iter_destroy(sit);
-
-        printf("\n");
-    }
-
-    map_iter_destroy(it);
-}
 
 void graph_destroy(graph* g)
 {
@@ -260,6 +268,11 @@ void graph_destroy(graph* g)
 //con las distancias más cercanas del origin a cada nodo
 map* dijkstra(graph* g, void* origin)
 {
+    if(map_get(g->adjacencyList, origin) == NULL) 
+    {
+        return NULL;
+    }
+
     // hashmap <node, int*>
     map* distances = map_create(100, g->hashFunc, g->equalsFunc);
 

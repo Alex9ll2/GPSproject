@@ -121,7 +121,7 @@
   /* returns TRUE if map contains the key */
   bool map_contains(map *m, void * key) 
   {
-    int bucket = m->hash(key) % m->M;
+    int bucket = (m->hash(key) % m->M + m->M) % m->M;
     node * n = m->hashTable[bucket];
     while(n != NULL) 
     {
@@ -142,7 +142,7 @@
        we need to determine in which of the many linked list we need to search,
        so compute bucket number just as we did with insert map_put*/
     
-    int bucket = m->hash(key) % m->M;
+    int bucket = (m->hash(key) % m->M + m->M) % m->M;
     node * n = m->hashTable[bucket];
 
     /* traverse all list until a node with equal key is found.

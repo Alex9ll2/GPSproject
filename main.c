@@ -23,6 +23,7 @@
 
 
 #define INITIAL_CAPACITY 100
+#define INPUT_SIZE 100
 
 //gcc main.c graph.c map.c set.c pq.c utils.c -o app
 
@@ -42,9 +43,22 @@ void mostrarMenu() {
 
 // lee una cadena de texto del usuario
 // recibe el mensaje a mostrar y donde guardar la respuesta
-void leerNodo(char* mensaje, char* destino, int tamano) {
+void leerNodo(char* mensaje, char* destino, int tamano) 
+{
     printf("%s", mensaje);
-    scanf("%s", destino);
+
+    if (fgets(destino, tamano, stdin) == NULL) 
+    {
+        destino[0] = '\0';
+        return;
+    }
+
+    size_t len = strlen(destino);
+
+    if (len > 0 && destino[len-1] == '\n') 
+    {
+      destino[len-1] = '\0';
+    }
 }
 
 // lee un numero entero del usuario
@@ -60,20 +74,21 @@ int leerPeso(char* mensaje) {
 // pide al usuario el nodo origen, nodo destino y peso
 void opcionAgregarArista(graph* g) {
     // variables para guardar los datos que ingresa el usuario
-    static char nodos[100][10];  // ruardamos los nodos para que no se pierdan
+    static char nodos[100][INPUT_SIZE];  // ruardamos los nodos para que no se pierdan
     static int contadorNodos = 0;
+
     
-    char tempOrigen[10];
-    char tempDestino[10];
+    char tempOrigen[INPUT_SIZE];
+    char tempDestino[INPUT_SIZE];
     int peso;
     
     printf("\n--- AGREGAR NUEVA ARISTA ---\n");
     
     // Pedimos el nodo de origen
-    leerNodo("Ingrese el nodo de origen: ", tempOrigen, 10);
+    leerNodo("Ingrese el nodo de origen: ", tempOrigen, INPUT_SIZE);
     
     // Pedimos el nodo de destino
-    leerNodo("Ingrese el nodo de destino: ", tempDestino, 10);
+    leerNodo("Ingrese el nodo de destino: ", tempDestino, INPUT_SIZE);
     
     // Pedimos el peso (distancia o costo)
     peso = leerPeso("Ingrese el peso de la arista: ");
@@ -140,31 +155,34 @@ void mostrarDijkstraBonito(map* resultado, char* origen) {
 
 
 void opcionCalcularRuta(graph* g) {
-    static char nodosRuta[100][10];
+    static char nodosRuta[100][INPUT_SIZE];
     static int contadorRuta = 0;
     
-    char tempOrigen[10];
+    char tempOrigen[INPUT_SIZE];
     
     printf("\n");
     printf("\n");
     printf(YELLOW"CALCULAR RUTA MAS CORTA (DIJKSTRA)\n"RESET);
     printf("\n");
     
-    // Pedimos el nodo de origen para calcular las distancias
-    leerNodo("\nIngrese el nodo de origen: ", tempOrigen, 10);
+    leerNodo("\nIngrese el nodo de origen: ", tempOrigen, INPUT_SIZE);
     
-    // Copiamos a memoria persistente
+    // copiamos a memoria persistente
     strcpy(nodosRuta[contadorRuta], tempOrigen);
     char* origen = nodosRuta[contadorRuta];
     contadorRuta++;
     
-    // Ejecutamos Dijkstra desde ese origen
-    map* resultado = dijkstra(g, origen);
     
-    // Mostramos los resultados de forma bonita
+    map* resultado = dijkstra(g, origen);
+
+    if(resultado == NULL)
+    {
+      printf("No se encontró el nodo\n");
+      return;
+    }
+    
     mostrarDijkstraBonito(resultado, origen);
     
-    // Liberamos la memoria del mapa
     map_destroy(resultado);
 }
 
@@ -255,6 +273,7 @@ int main()
     do {
         mostrarMenu();
         scanf("%d", &opcion);
+        getchar();
         
         switch (opcion) {
             case 1:
@@ -262,9 +281,8 @@ int main()
                 printf("\n");
                 printf("┌─────────────────────────────────────────────────┐\n");
                 printf("│              GRAFO ACTUAL                       │\n");
-                printf("├─────────────────────────────────────────────────┤\n");
-                graph_print(g);
                 printf("└─────────────────────────────────────────────────┘\n");
+                graph_print(g);
                 break;
                 
             case 2:
