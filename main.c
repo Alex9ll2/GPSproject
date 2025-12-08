@@ -247,7 +247,7 @@ void opcionEjemploPredefinido(graph* g) {
     // Mostramos una representacion visual del grafo
     printf("\n");
     printf("┌─────────────────────────────────────────────────┐\n");
-    printf(PURPLE"│           DIAGRAMA DEL GRAFO                    │\n"RESET);
+    printf("│      %sDIAGRAMA DEL GRAFO%s                         │\n", PURPLE, RESET);
     printf("├─────────────────────────────────────────────────┤\n");
     printf("│                                                 │\n");
     printf("│         (A)───5───(B)                           │\n");
