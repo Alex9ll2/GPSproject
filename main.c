@@ -29,17 +29,14 @@
 
 void mostrarMenu() {
     printf("\n");
-    printf("╔══════════════════════════════════════╗\n");
-    printf("║%s       SISTEMA GPS - MENU PRINCIPAL   %s║\n", CYAN, RESET);
-    printf("╠══════════════════════════════════════╣\n");
-    printf("║%s  1. Ver el grafo actual              %s║\n", BOLD, RESET);
-    printf("║%s  2. Agregar una arista               %s║\n", BOLD, RESET);
-    printf("║%s  3. Remover una arista               %s║\n", BOLD, RESET);
-    printf("║%s  4. Remover un Vertice               %s║\n", BOLD, RESET);
-    printf("║%s  5. Calcular ruta mas corta          %s║\n", BOLD, RESET);
-    printf("║%s  6. Ejecutar ejemplo predefinido     %s║\n", BOLD, RESET);
-    printf("║%s  7. Salir del programa               %s║\n", RED, RESET);
-    printf("╚══════════════════════════════════════╝\n");
+    printf("%s       SISTEMA GPS - MENU PRINCIPAL   %s\n", CYAN, RESET);
+    printf("%s  1. Ver el grafo actual              %s\n", BOLD, RESET);
+    printf("%s  2. Agregar una arista               %s\n", BOLD, RESET);
+    printf("%s  3. Remover una arista               %s\n", BOLD, RESET);
+    printf("%s  4. Remover un Vertice               %s\n", BOLD, RESET);
+    printf("%s  5. Calcular ruta mas corta          %s\n", BOLD, RESET);
+    printf("%s  6. Ejecutar ejemplo predefinido     %s\n", BOLD, RESET);
+    printf("%s  7. Salir del programa               %s\n", RED, RESET);
     printf("Seleccione una opcion: ");
 }
 
