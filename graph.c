@@ -50,7 +50,7 @@ Edge* edge_create(void* vertex, int distance)
     return edge;
 }
 
-graph* createGraph(int capacity, hash_func hashF, equals_func equalsF, comp_func compareF, print_func printF) 
+graph* graph_create(int capacity, hash_func hashF, equals_func equalsF, comp_func compareF, print_func printF) 
 {
     graph* g = malloc(sizeof(graph));
     g->adjacencyList = map_create(capacity, hashF, equalsF);
@@ -104,7 +104,7 @@ void graph_print(graph* g)
     map_iter_destroy(it);
 }
 
-bool addEdge(graph* g, void* from, void* to, int distance) 
+bool graph_addEdge(graph* g, void* from, void* to, int distance) 
 {
     if (!g || !from || !to) 
     {
@@ -161,7 +161,7 @@ set* getNeighbors(graph* g, void* key)
     return map_get(g->adjacencyList, key);
 }
 
-bool removeEdge(graph* g, void* from, void* to)
+bool graph_removeEdge(graph* g, void* from, void* to)
 {
     if (!g || !from || !to) 
     {
@@ -308,7 +308,7 @@ void graph_destroy(graph* g)
 
 //retorna un hashmap<vertex, int>
 //con las distancias más cercanas del origin a cada nodo
-map* dijkstra(graph* g, void* origin)
+map* graph_dijkstra(graph* g, void* origin)
 {
     if(map_get(g->adjacencyList, origin) == NULL) 
     {

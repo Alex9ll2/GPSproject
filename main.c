@@ -105,7 +105,7 @@ void opcionAgregarArista(graph* g) {
     contadorVertices++;
     
     // Agregamos la arista al grafo
-    addEdge(g, origen, destino, peso);
+    graph_addEdge(g, origen, destino, peso);
     
     printf("\n%s✓ Arista agregada exitosamente: %s ←→ %s (peso: %d)\n%s", GREEN, origen, destino, peso, RESET);
 }
@@ -121,7 +121,7 @@ void opcionRemoverArista(graph* g)
   leerVertice("Ingrese el origen de la arista a eliminar: ", tempFrom, INPUT_SIZE);
   leerVertice("Ingrese el destino de la arista a eliminar: ", tempTo, INPUT_SIZE);
   
-  if(removeEdge(g, tempFrom, tempTo))
+  if(graph_removeEdge(g, tempFrom, tempTo))
   {
     printf("Se eliminó la arista correctamente\n");
     return;
@@ -163,7 +163,7 @@ void mostrarGrafoBonito(graph* g, map* adyacencia) {
     printf("└─────────────────────────────────────────────────┘\n");
 }
 
-// mostrar los resultados de dijkstra de forma amigable
+// mostrar los resultados de graph_dijkstra de forma amigable
 // recibe el mapa con las distancias y el nombre del origen
 void mostrarDijkstraBonito(map* resultado, char* origen) {
     printf("\n");
@@ -204,7 +204,7 @@ void opcionCalcularRuta(graph* g) {
     
     leerVertice("\nIngrese el vertice de origen: ", tempOrigen, INPUT_SIZE);
     
-    map* resultado = dijkstra(g, tempOrigen);
+    map* resultado = graph_dijkstra(g, tempOrigen);
 
     if(resultado == NULL)
     {
@@ -227,15 +227,15 @@ void opcionEjemploPredefinido(graph* g) {
     
     // Estas son las aristas del ejemplo original
     // Representan un grafo con 6 vtxs: A, B, C, D, E, F
-    addEdge(g, "A", "C", 2);
-    addEdge(g, "A", "B", 5);
-    addEdge(g, "C", "B", 7);
-    addEdge(g, "B", "D", 8);
-    addEdge(g, "C", "D", 4);
-    addEdge(g, "C", "E", 8);
-    addEdge(g, "E", "D", 6);
-    addEdge(g, "E", "F", 3);
-    addEdge(g, "D", "F", 4);
+    graph_addEdge(g, "A", "C", 2);
+    graph_addEdge(g, "A", "B", 5);
+    graph_addEdge(g, "C", "B", 7);
+    graph_addEdge(g, "B", "D", 8);
+    graph_addEdge(g, "C", "D", 4);
+    graph_addEdge(g, "C", "E", 8);
+    graph_addEdge(g, "E", "D", 6);
+    graph_addEdge(g, "E", "F", 3);
+    graph_addEdge(g, "D", "F", 4);
     
     printf(GREEN"\n✓ Se agregaron 9 aristas al grafo.\n"RESET);
     
@@ -275,7 +275,7 @@ void opcionEjemploPredefinido(graph* g) {
     
     // Recorremos cada origen y mostramos las distancias
     for (int i = 0; i < 6; i++) {
-        map* resultado = dijkstra(g, origenes[i]);
+        map* resultado = graph_dijkstra(g, origenes[i]);
         mostrarDijkstraBonito(resultado, origenes[i]);
         map_destroy(resultado);
     }
@@ -286,7 +286,7 @@ void opcionEjemploPredefinido(graph* g) {
 
 int main()
 {
-    graph* g = createGraph(INITIAL_CAPACITY, wordHash, wordEquals, wordCompare, printString);
+    graph* g = graph_create(INITIAL_CAPACITY, wordHash, wordEquals, wordCompare, printString);
     
     int opcion;
     
