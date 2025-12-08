@@ -347,6 +347,7 @@ void destroyNode(node * n, print_func pf)
 void set_destroy(set * s) 
 {
   destroyNode(s->root, s->printme);
+  free(s);
 }
 
 
@@ -356,7 +357,8 @@ struct set_iterator_str{
     int index;
 };
 
-void fillArrayInorder(node* n, void** arr, int* index) {
+void fillArrayInorder(node* n, void** arr, int* index) 
+{
     if (n == NULL) return;
 
     fillArrayInorder(n->left, arr, index);
@@ -391,12 +393,14 @@ bool set_iter_has_next(set_iterator* it)
   return it->index < it->size;
 }
 
-void* set_iter_next(set_iterator* it) {
+void* set_iter_next(set_iterator* it) 
+{
     return it->arr[it->index++];
 }
 
 
-void set_iter_destroy(set_iterator* it) {
+void set_iter_destroy(set_iterator* it) 
+{
     free(it->arr);
     free(it);
 }

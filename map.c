@@ -70,7 +70,7 @@
   {
     /* get bucket number to insert */
     int hashcode = m->hash(key);
-    int bucket = hashcode % m->M;
+    int bucket = (hashcode % m->M + m->M) % m->M;
     // printf("map_put: hashing key = %d\n", hashcode);
     // printf("map_put: bucket = hash mod %d = %d\n", m->M, bucket);
    
@@ -110,7 +110,7 @@
       finding our key, so lets insert a new one, lets put it in the header
       of the list */
 
-    printf("map_put:key not found create new node\n");
+    //printf("map_put:key not found create new node\n");
     node * new = createNode(key, value);
     new->next = m->hashTable[bucket];
     m->hashTable[bucket] = new;
@@ -208,14 +208,13 @@ void map_print(map* m, print_func printKey, print_func printValue)
 
   
 //map iterator
-// map_iterator struct (mantén el typedef igual que antes)
 struct map_iterator_str {
   map * m;
   int bucketIndex;
   node * currentNode;
 };
 
-// Crear iterador: posiciona en el primer nodo válido o currentNode = NULL si no hay.
+// posiciona en el primer nodo válido o currentNode = null si no hay
 map_iterator * map_iter_create(map * m) 
 {
   map_iterator * it = malloc(sizeof(map_iterator));
@@ -224,41 +223,54 @@ map_iterator * map_iter_create(map * m)
   it->currentNode = NULL;
 
   // find first non-empty bucket
-  while (it->bucketIndex < it->m->M && it->m->hashTable[it->bucketIndex] == NULL) {
+  while (it->bucketIndex < it->m->M && it->m->hashTable[it->bucketIndex] == NULL) 
+  {
     it->bucketIndex++;
   }
-  if (it->bucketIndex < it->m->M) {
+
+  if (it->bucketIndex < it->m->M) 
+  {
     it->currentNode = it->m->hashTable[it->bucketIndex];
-  } else {
+  } 
+  else 
+  {
     it->currentNode = NULL;
   }
+
   return it;
 }
 
-// Devuelve true si hay un elemento disponible ahora o en algún bucket futuro.
+// devuelve true si hay un elemento disponible ahora o en algún bucket futuro
 bool map_iter_has_next(map_iterator * it) 
 {
   return it->currentNode != NULL;
 }
 
-// Devuelve la key actual y avanza el iterador (o NULL si no hay más)
+// devuelve la key actual y avanza el iterador (o null si no hay mas)
 void * map_iter_next(map_iterator * it) 
 {
-  if (!it->currentNode) return NULL;
+  if (!it->currentNode)
+  { 
+    return NULL;
+  }
 
   void * result = it->currentNode->key;
 
-  // Avanzar en la lista actual
-  if (it->currentNode->next != NULL) {
+  // avanzar en la lista actual
+  if (it->currentNode->next != NULL) 
+  {
     it->currentNode = it->currentNode->next;
     return result;
   }
 
-  // Sino, buscar el siguiente bucket no vacío
+  // sino buscar el siguiente bucket no vacio
   int idx = it->bucketIndex + 1;
   it->currentNode = NULL;
-  while (idx < it->m->M) {
-    if (it->m->hashTable[idx] != NULL) {
+
+  while (idx < it->m->M) 
+  {
+    if (it->m->hashTable[idx] != NULL) 
+    {
       it->bucketIndex = idx;
       it->currentNode = it->m->hashTable[idx];
       break;

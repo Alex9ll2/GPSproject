@@ -25,14 +25,7 @@
 #define INITIAL_CAPACITY 100
 
 //gcc main.c graph.c map.c set.c pq.c utils.c -o app
-//graph
 
-
-// Abimael
-
-
-// Esta funcion muestra el menu principal en la consola
-// Es muy sencilla: solo imprime las opciones disponibles
 void mostrarMenu() {
     printf("\n");
     printf("╔══════════════════════════════════════╗\n");
@@ -47,15 +40,15 @@ void mostrarMenu() {
     printf("Seleccione una opcion: ");
 }
 
-// Esta funcion lee una cadena de texto del usuario
-// Recibe el mensaje a mostrar y donde guardar la respuesta
+// lee una cadena de texto del usuario
+// recibe el mensaje a mostrar y donde guardar la respuesta
 void leerNodo(char* mensaje, char* destino, int tamano) {
     printf("%s", mensaje);
     scanf("%s", destino);
 }
 
-// Esta funcion lee un numero entero del usuario
-// Recibe el mensaje a mostrar y retorna el numero leido
+// lee un numero entero del usuario
+// recibe el mensaje a mostrar y retorna el numero leido
 int leerPeso(char* mensaje) {
     int peso;
     printf("%s", mensaje);
@@ -63,11 +56,11 @@ int leerPeso(char* mensaje) {
     return peso;
 }
 
-// Esta funcion permite agregar una arista al grafo
-// Pide al usuario: nodo origen, nodo destino y peso
+// opcion del menu para agregar una arista al grafo
+// pide al usuario el nodo origen, nodo destino y peso
 void opcionAgregarArista(graph* g) {
-    // Variables para guardar los datos que ingresa el usuario
-    static char nodos[100][10];  // Guardamos los nodos para que no se pierdan
+    // variables para guardar los datos que ingresa el usuario
+    static char nodos[100][10];  // ruardamos los nodos para que no se pierdan
     static int contadorNodos = 0;
     
     char tempOrigen[10];
@@ -100,8 +93,8 @@ void opcionAgregarArista(graph* g) {
     printf("\n%s✓ Arista agregada exitosamente: %s ←→ %s (peso: %d)\n%s", GREEN, origen, destino, peso, RESET);
 }
 
-// Esta funcion muestra el grafo de forma bonita y facil de entender
-// Recibe el grafo y el mapa de adyacencia interno
+// mostrar el grafo de forma bonita y facil de entender
+// recibe el grafo y el mapa de adyacencia interno
 void mostrarGrafoBonito(graph* g, map* adyacencia) {
     printf("\n");
     printf("┌─────────────────────────────────────────────────┐\n");
@@ -115,8 +108,8 @@ void mostrarGrafoBonito(graph* g, map* adyacencia) {
     printf("└─────────────────────────────────────────────────┘\n");
 }
 
-// Esta funcion muestra los resultados de Dijkstra de forma amigable
-// Recibe el mapa con las distancias y el nombre del origen
+// mostrar los resultados de dijkstra de forma amigable
+// recibe el mapa con las distancias y el nombre del origen
 void mostrarDijkstraBonito(map* resultado, char* origen) {
     printf("\n");
     printf("\n");
@@ -145,8 +138,7 @@ void mostrarDijkstraBonito(map* resultado, char* origen) {
     printf("\n");
 }
 
-// Esta funcion calcula la ruta mas corta desde un nodo origen
-// Usa el algoritmo de Dijkstra que ya esta implementado
+
 void opcionCalcularRuta(graph* g) {
     static char nodosRuta[100][10];
     static int contadorRuta = 0;
@@ -176,8 +168,7 @@ void opcionCalcularRuta(graph* g) {
     map_destroy(resultado);
 }
 
-// Esta funcion ejecuta el ejemplo que ya estaba en el codigo original
-// Sirve para demostrar como funciona el programa con datos conocidos
+// ejemplo que sirve para demostrar como funciona el programa con datos conocidos
 void opcionEjemploPredefinido(graph* g) {
     printf("\n");
     printf("\n");
@@ -244,21 +235,15 @@ void opcionEjemploPredefinido(graph* g) {
 }
 
 
-//Abimael
+
 
 
 int main()
 {
-    
-    //Abimael
-    
-    // Creamos el grafo vacio al iniciar el programa
     graph* g = createGraph(INITIAL_CAPACITY, wordHash, wordEquals, wordCompare, printString);
     
-    // Variable para guardar la opcion que elija el usuario
     int opcion;
     
-    // Mensaje de bienvenida
     printf("\n");
     printf("\n");
     printf("\n");
@@ -267,17 +252,13 @@ int main()
     printf("\n");
     printf("\n");
     
-    // Este es el ciclo principal del menu
-    // Se repite hasta que el usuario elija salir (opcion 5)
     do {
-        // Mostramos el menu y leemos la opcion
         mostrarMenu();
         scanf("%d", &opcion);
         
-        // Segun la opcion elegida, ejecutamos la accion correspondiente
         switch (opcion) {
             case 1:
-                // Opcion 1: Mostrar el grafo actual
+                //mostrar el grafo actual
                 printf("\n");
                 printf("┌─────────────────────────────────────────────────┐\n");
                 printf("│              GRAFO ACTUAL                       │\n");
@@ -287,22 +268,22 @@ int main()
                 break;
                 
             case 2:
-                // Opcion 2: Agregar una nueva arista
+                // agregar una nueva arista
                 opcionAgregarArista(g);
                 break;
                 
             case 3:
-                // Opcion 3: Calcular ruta mas corta
+                // calcular ruta mas corta
                 opcionCalcularRuta(g);
                 break;
                 
             case 4:
-                // Opcion 4: Ejecutar el ejemplo predefinido
+                // ejecutar el ejemplo predefinido
                 opcionEjemploPredefinido(g);
                 break;
                 
             case 5:
-                // Opcion 5: Salir del programa
+                // salir del programa
                 printf("\n");
                 printf("\n");
                 printf(GREEN"Gracias por usar el Sistema GPS\n"RESET);
@@ -311,17 +292,13 @@ int main()
                 break;
                 
             default:
-                // Si el usuario ingresa una opcion invalida
                 printf("\n%s⚠ Opcion no valida. Por favor, elija entre 1 y 5.%s\n", RED, RESET);
                 break;
         }
         
-    } while (opcion != 5);  // Repetir mientras no sea salir
+    } while (opcion != 5);  
     
-    // Liberamos la memoria del grafo antes de terminar
     graph_destroy(g);
-    
-    // Abimael 
     
     return 0;
 }
