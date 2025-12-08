@@ -129,14 +129,10 @@ bool addEdge(graph* g, void* from, void* to, int distance)
     {
         Edge* e = edge_create(to, distance);
         set_add(edgesSet, e);
-        printf("Added: %s -> %s\n", from, to);
-        graph_print(g);
     }
 
     // to -> from
-    printf("Todo normal\n");
     edgesSet = map_get(g->adjacencyList, to);
-    printf("CRASHEA\n");
 
     if (!edgesSet) 
     {
@@ -150,8 +146,6 @@ bool addEdge(graph* g, void* from, void* to, int distance)
     {
         Edge* r = edge_create(from, distance);
         set_add(edgesSet, r);
-        printf("Se insertó: %s -> %s\n", to, from);
-        graph_print(g);
     }
 
 

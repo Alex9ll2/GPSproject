@@ -34,9 +34,10 @@ void mostrarMenu() {
     printf("╠══════════════════════════════════════╣\n");
     printf("║%s  1. Ver el grafo actual              %s║\n", BOLD, RESET);
     printf("║%s  2. Agregar una arista               %s║\n", BOLD, RESET);
-    printf("║%s  3. Calcular ruta mas corta          %s║\n", BOLD, RESET);
-    printf("║%s  4. Ejecutar ejemplo predefinido     %s║\n", BOLD, RESET);
-    printf("║%s  5. Salir del programa               %s║\n", RED, RESET);
+    printf("║%s  3. Remover una arista               %s║\n", BOLD, RESET);
+    printf("║%s  4. Calcular ruta mas corta          %s║\n", BOLD, RESET);
+    printf("║%s  5. Ejecutar ejemplo predefinido     %s║\n", BOLD, RESET);
+    printf("║%s  6. Salir del programa               %s║\n", RED, RESET);
     printf("╚══════════════════════════════════════╝\n");
     printf("Seleccione una opcion: ");
 }
@@ -108,6 +109,28 @@ void opcionAgregarArista(graph* g) {
     printf("\n%s✓ Arista agregada exitosamente: %s ←→ %s (peso: %d)\n%s", GREEN, origen, destino, peso, RESET);
 }
 
+
+void opcionRemoverArista(graph* g)
+{
+  char tempFrom[INPUT_SIZE];
+  char tempTo[INPUT_SIZE];
+  printf("\n");
+  printf("\n");
+  printf(RED"ELIMINAR ARISTA\n"RESET);  
+  leerNodo("Ingrese el origen de la arista a eliminar: ", tempFrom, INPUT_SIZE);
+  leerNodo("\nIngrese el destino de la arista a eliminar: ", tempTo, INPUT_SIZE);
+  
+  if(removeEdge(g, tempFrom, tempTo))
+  {
+    printf("Se eliminó la arista correctamente\n");
+    return;
+  }
+
+  printf("Arista no encontrada\n");
+  
+
+}
+
 // mostrar el grafo de forma bonita y facil de entender
 // recibe el grafo y el mapa de adyacencia interno
 void mostrarGrafoBonito(graph* g, map* adyacencia) {
@@ -155,9 +178,6 @@ void mostrarDijkstraBonito(map* resultado, char* origen) {
 
 
 void opcionCalcularRuta(graph* g) {
-    static char nodosRuta[100][INPUT_SIZE];
-    static int contadorRuta = 0;
-    
     char tempOrigen[INPUT_SIZE];
     
     printf("\n");
@@ -167,13 +187,7 @@ void opcionCalcularRuta(graph* g) {
     
     leerNodo("\nIngrese el nodo de origen: ", tempOrigen, INPUT_SIZE);
     
-    // copiamos a memoria persistente
-    strcpy(nodosRuta[contadorRuta], tempOrigen);
-    char* origen = nodosRuta[contadorRuta];
-    contadorRuta++;
-    
-    
-    map* resultado = dijkstra(g, origen);
+    map* resultado = dijkstra(g, tempOrigen);
 
     if(resultado == NULL)
     {
@@ -181,7 +195,7 @@ void opcionCalcularRuta(graph* g) {
       return;
     }
     
-    mostrarDijkstraBonito(resultado, origen);
+    mostrarDijkstraBonito(resultado, tempOrigen);
     
     map_destroy(resultado);
 }
@@ -253,9 +267,6 @@ void opcionEjemploPredefinido(graph* g) {
 }
 
 
-
-
-
 int main()
 {
     graph* g = createGraph(INITIAL_CAPACITY, wordHash, wordEquals, wordCompare, printString);
@@ -289,18 +300,23 @@ int main()
                 // agregar una nueva arista
                 opcionAgregarArista(g);
                 break;
-                
+
             case 3:
+                // remover arista
+                opcionRemoverArista(g);
+                break;
+                
+            case 4:
                 // calcular ruta mas corta
                 opcionCalcularRuta(g);
                 break;
                 
-            case 4:
+            case 5:
                 // ejecutar el ejemplo predefinido
                 opcionEjemploPredefinido(g);
                 break;
                 
-            case 5:
+            case 6:
                 // salir del programa
                 printf("\n");
                 printf("\n");
@@ -314,7 +330,7 @@ int main()
                 break;
         }
         
-    } while (opcion != 5);  
+    } while (opcion != 6);  
     
     graph_destroy(g);
     
