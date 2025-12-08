@@ -35,16 +35,17 @@ void mostrarMenu() {
     printf("║%s  1. Ver el grafo actual              %s║\n", BOLD, RESET);
     printf("║%s  2. Agregar una arista               %s║\n", BOLD, RESET);
     printf("║%s  3. Remover una arista               %s║\n", BOLD, RESET);
-    printf("║%s  4. Calcular ruta mas corta          %s║\n", BOLD, RESET);
-    printf("║%s  5. Ejecutar ejemplo predefinido     %s║\n", BOLD, RESET);
-    printf("║%s  6. Salir del programa               %s║\n", RED, RESET);
+    printf("║%s  4. Remover un Vertice               %s║\n", BOLD, RESET);
+    printf("║%s  5. Calcular ruta mas corta          %s║\n", BOLD, RESET);
+    printf("║%s  6. Ejecutar ejemplo predefinido     %s║\n", BOLD, RESET);
+    printf("║%s  7. Salir del programa               %s║\n", RED, RESET);
     printf("╚══════════════════════════════════════╝\n");
     printf("Seleccione una opcion: ");
 }
 
 // lee una cadena de texto del usuario
 // recibe el mensaje a mostrar y donde guardar la respuesta
-void leerNodo(char* mensaje, char* destino, int tamano) 
+void leerVertice(char* mensaje, char* destino, int tamano) 
 {
     printf("%s", mensaje);
 
@@ -72,11 +73,11 @@ int leerPeso(char* mensaje) {
 }
 
 // opcion del menu para agregar una arista al grafo
-// pide al usuario el nodo origen, nodo destino y peso
+// pide al usuario el vtx origen, vtx destino y peso
 void opcionAgregarArista(graph* g) {
     // variables para guardar los datos que ingresa el usuario
-    static char nodos[100][INPUT_SIZE];  // ruardamos los nodos para que no se pierdan
-    static int contadorNodos = 0;
+    static char vtxs[100][INPUT_SIZE];  // ruardamos los vtxs para que no se pierdan
+    static int contadorVertices = 0;
 
     
     char tempOrigen[INPUT_SIZE];
@@ -85,23 +86,23 @@ void opcionAgregarArista(graph* g) {
     
     printf("\n--- AGREGAR NUEVA ARISTA ---\n");
     
-    // Pedimos el nodo de origen
-    leerNodo("Ingrese el nodo de origen: ", tempOrigen, INPUT_SIZE);
+    // Pedimos el vtx de origen
+    leerVertice("Ingrese el vertice de origen: ", tempOrigen, INPUT_SIZE);
     
-    // Pedimos el nodo de destino
-    leerNodo("Ingrese el nodo de destino: ", tempDestino, INPUT_SIZE);
+    // Pedimos el vtx de destino
+    leerVertice("Ingrese el vertice de destino: ", tempDestino, INPUT_SIZE);
     
     // Pedimos el peso (distancia o costo)
     peso = leerPeso("Ingrese el peso de la arista: ");
     
-    // Copiamos los nodos a memoria persistente
-    strcpy(nodos[contadorNodos], tempOrigen);
-    char* origen = nodos[contadorNodos];
-    contadorNodos++;
+    // Copiamos los vtxs a memoria persistente
+    strcpy(vtxs[contadorVertices], tempOrigen);
+    char* origen = vtxs[contadorVertices];
+    contadorVertices++;
     
-    strcpy(nodos[contadorNodos], tempDestino);
-    char* destino = nodos[contadorNodos];
-    contadorNodos++;
+    strcpy(vtxs[contadorVertices], tempDestino);
+    char* destino = vtxs[contadorVertices];
+    contadorVertices++;
     
     // Agregamos la arista al grafo
     addEdge(g, origen, destino, peso);
@@ -117,8 +118,8 @@ void opcionRemoverArista(graph* g)
   printf("\n");
   printf("\n");
   printf(RED"ELIMINAR ARISTA\n"RESET);  
-  leerNodo("Ingrese el origen de la arista a eliminar: ", tempFrom, INPUT_SIZE);
-  leerNodo("\nIngrese el destino de la arista a eliminar: ", tempTo, INPUT_SIZE);
+  leerVertice("Ingrese el origen de la arista a eliminar: ", tempFrom, INPUT_SIZE);
+  leerVertice("Ingrese el destino de la arista a eliminar: ", tempTo, INPUT_SIZE);
   
   if(removeEdge(g, tempFrom, tempTo))
   {
@@ -127,8 +128,24 @@ void opcionRemoverArista(graph* g)
   }
 
   printf("Arista no encontrada\n");
-  
+}
 
+
+void opcionRemoverVertice(graph* g)
+{
+  char tempVertex[INPUT_SIZE];
+  printf("\n");
+  printf("\n");
+  printf(RED"ELIMINAR VERTICE\n"RESET);  
+  leerVertice("Ingrese el vertice a eliminar: ", tempVertex, INPUT_SIZE);
+  
+  if(graph_removeVertex(g, tempVertex))
+  {
+    printf("Se eliminó el vertice correctamente\n");
+    return;
+  }
+
+  printf("Vertice no encontrado\n");
 }
 
 // mostrar el grafo de forma bonita y facil de entender
@@ -151,7 +168,7 @@ void mostrarGrafoBonito(graph* g, map* adyacencia) {
 void mostrarDijkstraBonito(map* resultado, char* origen) {
     printf("\n");
     printf("\n");
-    printf("%s         DISTANCIAS DESDE NODO: %-10s       %s\n", PURPLE, origen, RESET);
+    printf("%s         DISTANCIAS DESDE VERTICE: %-10s       %s\n", PURPLE, origen, RESET);
     printf("\n");
     printf("│   Destino    │   Distancia                     \n");
     printf("├──────────────┼─────────────\n");
@@ -160,14 +177,14 @@ void mostrarDijkstraBonito(map* resultado, char* origen) {
     map_iterator* it = map_iter_create(resultado);
     
     while (map_iter_has_next(it)) {
-        void* nodo = map_iter_next(it);
-        int* distancia = (int*) map_get(resultado, nodo);
+        void* vtx = map_iter_next(it);
+        int* distancia = (int*) map_get(resultado, vtx);
         
         // Si la distancia es muy grande (infinito), mostramos "∞"
         if (*distancia == INT_MAX || *distancia < 0) {
-            printf("│      %-8s│   No alcanzable (∞)            \n", (char*)nodo);
+            printf("│      %-8s│   No alcanzable (∞)            \n", (char*)vtx);
         } else {
-            printf("│      %-8s│   %d                             \n", (char*)nodo, *distancia);
+            printf("│      %-8s│   %d                             \n", (char*)vtx, *distancia);
         }
     }
     
@@ -185,13 +202,13 @@ void opcionCalcularRuta(graph* g) {
     printf(YELLOW"CALCULAR RUTA MAS CORTA (DIJKSTRA)\n"RESET);
     printf("\n");
     
-    leerNodo("\nIngrese el nodo de origen: ", tempOrigen, INPUT_SIZE);
+    leerVertice("\nIngrese el vertice de origen: ", tempOrigen, INPUT_SIZE);
     
     map* resultado = dijkstra(g, tempOrigen);
 
     if(resultado == NULL)
     {
-      printf("No se encontró el nodo\n");
+      printf("No se encontró el vertice\n");
       return;
     }
     
@@ -209,7 +226,7 @@ void opcionEjemploPredefinido(graph* g) {
     printf("\nAgregando aristas del ejemplo...\n");
     
     // Estas son las aristas del ejemplo original
-    // Representan un grafo con 6 nodos: A, B, C, D, E, F
+    // Representan un grafo con 6 vtxs: A, B, C, D, E, F
     addEdge(g, "A", "C", 2);
     addEdge(g, "A", "B", 5);
     addEdge(g, "C", "B", 7);
@@ -248,7 +265,7 @@ void opcionEjemploPredefinido(graph* g) {
     printf("│                                                 │\n");
     printf("└─────────────────────────────────────────────────┘\n");
     
-    // Calculamos Dijkstra desde cada nodo
+    // Calculamos Dijkstra desde cada vtx
     char* origenes[] = {"A", "B", "C", "D", "E", "F"};
     
     printf("\n");
@@ -305,18 +322,23 @@ int main()
                 // remover arista
                 opcionRemoverArista(g);
                 break;
-                
+
             case 4:
+                // remover vtx
+                opcionRemoverVertice(g);
+                break;
+                
+            case 5:
                 // calcular ruta mas corta
                 opcionCalcularRuta(g);
                 break;
                 
-            case 5:
+            case 6:
                 // ejecutar el ejemplo predefinido
                 opcionEjemploPredefinido(g);
                 break;
                 
-            case 6:
+            case 7:
                 // salir del programa
                 printf("\n");
                 printf("\n");
@@ -330,7 +352,7 @@ int main()
                 break;
         }
         
-    } while (opcion != 6);  
+    } while (opcion != 7);  
     
     graph_destroy(g);
     

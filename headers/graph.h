@@ -15,6 +15,7 @@ graph* createGraph(int capacity,
 bool addEdge(graph* g, void* from, void* to, int weight);
 void graph_print(graph* g);
 bool removeEdge(graph* g, void* from, void* to);
+bool graph_removeVertex(graph* g, void* vertex);
 graph* getNeighbors(graph* g, void* key);
 void graph_destroy(graph* g);
 map* dijkstra(graph* g, void* origin);

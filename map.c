@@ -117,6 +117,44 @@
     m->size ++;
     
   }
+
+  bool map_remove(map* m, void* key)
+  {
+      if (!m || !key)
+          return false;
+
+      int hashcode = m->hash(key);
+      int bucket = (hashcode % m->M + m->M) % m->M;
+
+      node* curr = m->hashTable[bucket];
+      node* prev = NULL;
+
+      while (curr != NULL)
+      {
+          if (m->key_equals(curr->key, key))
+          {
+              // si es el primer nodo del bucket
+              if (prev == NULL)
+              {
+                  m->hashTable[bucket] = curr->next;
+              }
+              else
+              {
+                  prev->next = curr->next;
+              }
+
+              free(curr);
+              m->size--;
+
+              return true;
+          }
+
+          prev = curr;
+          curr = curr->next;
+      }
+
+      return false; 
+  }
   
   /* returns TRUE if map contains the key */
   bool map_contains(map *m, void * key) 

@@ -10,6 +10,7 @@ map *  map_create  (int m, hash_func, equals_func);
 int  map_size    (map * m);
 int  map_capacity(map * m);
 void map_put     (map * m, void * key, void * value);
+bool map_remove(map* m, void* key);
 bool map_contains(map * m, void * key);
 void * map_get     (map * m, void * key);
 void map_destroy(map * m);
